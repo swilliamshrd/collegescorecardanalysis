@@ -1,14 +1,14 @@
 ##################
 ###   setup    ###
 ##################
-working.directory <- "I:/User/Williams/2016 Interim/College Scorecard Analysis"
+#working.directory <- "I:/User/Williams/2016 Interim/College Scorecard Analysis"
+working.directory <- "~/Documents/hrd/collegescorecardanalysis"
 
 setwd(working.directory)
 
 library(dplyr)
 library(ggplot2)
 library(scales)
-library(ggthemes)
 
 load("debtdata_clean.rda")
 
@@ -43,6 +43,9 @@ graphcategories <- debtdata %>%
       summarise(meandebt = mean(debt_mdn))
 
 
+####################################
+##Side by Side Face Graph by inst ##
+####################################
 
 graph <- graphcategories %>%
             filter(DegreeLevel == "Certificate/Associates" | DegreeLevel == "Bachelor's") %>%
@@ -51,14 +54,24 @@ graph <- graphcategories %>%
                        color=factor(mn.category),
                        group = factor(mn.category)))
 
+setEPS()
+postscript("debttrendsidebyside.eps", width=1000, height=600)
 graph + 
       geom_line(size = 1.5) +
       scale_x_continuous("", limits = c(1997, 2013), breaks = c(1997, 2001, 2005, 2009, 2013)) +
       scale_y_continuous("Average Median Debt Amount Upon Entering Repayment", limits = c(0,20000), labels=dollar) +
-      guides(linetype = guide_legend(title = "")) +
+      guides(color = guide_legend(title = "")) +
       theme_minimal() +
       theme(legend.position = "bottom") +
-      facet_wrap(~DegreeLevel)
+      theme(axis.text.y = element_text(size=10))+
+      facet_grid(.~DegreeLevel)
+
+
+
+
+####################################
+## separate graphs for 2 and 4 yr ##
+####################################
 
 twoyeargraph <- graphcategories %>%
                   filter(DegreeLevel == "Certificate/Associates") %>%
