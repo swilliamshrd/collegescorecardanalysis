@@ -34,14 +34,23 @@ debtdata <- mutate(debtdata, instnm = tolower(instnm)) %>%
             mutate(instnm = gsub("Of", "of", instnm)) 
 
 
-#### categorize schools ####
 
+#### categorize schools by number of years ## 
+debtdata$DegreeLevel <- ""
+debtdata[(debtdata$preddeg == 1 | debtdata$preddeg == 2),]$DegreeLevel <- "Certificate/Associates"
+debtdata[debtdata$preddeg == 3,]$DegreeLevel <- "Bachelor's"
+debtdata[debtdata$preddeg == 4,]$DegreeLevel <- "Bachelor's"
+
+
+#### categorize schools narrowly ####
 debtdata$school.category <- ""
       
       #Publics
       debtdata[debtdata$control == 1 & debtdata$preddeg == 1, ]$school.category <- "Public Certificate"
       debtdata[debtdata$control == 1 & debtdata$preddeg == 2, ]$school.category <- "Public Associate's"
       debtdata[debtdata$control == 1 & debtdata$preddeg == 3, ]$school.category <- "Public Bachelor's"
+      debtdata[debtdata$control == 1 & debtdata$preddeg == 4, ]$school.category <- "Public Graduate"
+      
       
       #non-profits
       debtdata[debtdata$control == 2 & debtdata$preddeg == 1, ]$school.category <- "Non-Profit Certificate"
@@ -66,16 +75,15 @@ debtdata$degree.category <- ""
       debtdata[debtdata$preddeg== 3, ]$degree.category <- "4-Year Bachelor's"
       debtdata[debtdata$preddeg==4,]$degree.category <- "Graduate Degree"
 
-#### Categorize Schools in to HRD categories ####
-debtdata$hrd.category <- ""
 
-      debtdata$hrd.category <- replace(debtdata$hrd.category, grep("University of Minnesota-", debtdata$instnm), "U of M")
-      debtdata$hrd.category <- replace(debtdata$hrd.category,debtdata$control == 1 & debtdata$preddeg==3 & debtdata$hrd.category != "U of M" , "MnSCU 4-Year")
-      debtdata$hrd.category <- replace(debtdata$hrd.category,debtdata$control == 1 & debtdata$preddeg %in% c(1,2) & debtdata$hrd.category!="U of M", "MnSCU 2-Year")
-      debtdata$hrd.category <- replace(debtdata$hrd.category,debtdata$control == 1 & debtdata$preddeg %in% c(1,2) & debtdata$hrd.category!="U of M", "MnSCU 2-Year")
-      debtdata$hrd.category <- replace(debtdata$hrd.category,debtdata$control == 2, "Private, Non-Profit")
-      debtdata$hrd.category <- replace(debtdata$hrd.category,debtdata$control == 3, "Private, For-Profit")
-      
+#### Categorize Schools in to Minnesota categories ####
+debtdata$mn.category <- ""
+
+debtdata$mn.category <- replace(debtdata$mn.category, grep("University of Minnesota-", debtdata$instnm), "U of M")
+debtdata$mn.category <- replace(debtdata$mn.category,debtdata$control == 1 & debtdata$mn.category != "U of M" , "Minnesota State")
+debtdata$mn.category <- replace(debtdata$mn.category,debtdata$control == 2, "Private, Non-Profit")
+debtdata$mn.category <- replace(debtdata$mn.category,debtdata$control == 3, "Private, For-Profit")
+
 ##Save file
 save(debtdata, file = "debtdata_clean.rda")
                                              
