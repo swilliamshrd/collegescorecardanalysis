@@ -1,8 +1,8 @@
 ##################
 ###   setup    ###
 ##################
-#working.directory <- "I:/User/Williams/2016 Interim/College Scorecard Analysis"
-working.directory <- "~/Documents/hrd/collegescorecardanalysis"
+#working.directory <- "~/Documents/hrd/collegescorecardanalysis"
+working.directory <- "I:/User/Williams/2016 Interim/College Scorecard Analysis"
 
 setwd(working.directory)
 
@@ -47,57 +47,151 @@ graphcategories <- debtdata %>%
 ##Side by Side Face Graph by inst ##
 ####################################
 
-graph <- graphcategories %>%
-            filter(DegreeLevel == "Certificate/Associates" | DegreeLevel == "Bachelor's") %>%
+
+#### Black and white version ####
+graph_bw <- graphcategories %>%
+            filter(DegreeLevel == "Certificate/Associate's" | DegreeLevel == "Bachelor's") %>%
+            mutate(DegreeLevel = factor(DegreeLevel, 
+                                        levels = c("Bachelor's",
+                                                   "Certificate/Associate's"                   ),
+                                        labels=c("Predominantly 4-Year Degree Granting", 
+                                        "Predominantly 2-Year Degree Granting"))) %>%
             ggplot(aes(x=data.year,
                        y=meandebt,
-                       color=factor(mn.category),
+                       shape=factor(mn.category),
                        group = factor(mn.category)))
 
-setEPS()
-postscript("debttrendsidebyside.eps", width=1000, height=600)
-graph + 
-      geom_line(size = 1.5) +
+
+sidebyside_bw <- graph_bw + 
+      geom_line() + 
+      geom_point(size=2) +
       scale_x_continuous("", limits = c(1997, 2013), breaks = c(1997, 2001, 2005, 2009, 2013)) +
-      scale_y_continuous("Average Median Debt Amount Upon Entering Repayment", limits = c(0,20000), labels=dollar) +
-      guides(color = guide_legend(title = "")) +
-      theme_minimal() +
+      scale_y_continuous("Average Median Debt (Nominal $)", limits = c(0,20000), labels=dollar) +
+      guides(shape = guide_legend(title = "")) +
+      theme_bw() +
       theme(legend.position = "bottom") +
-      theme(axis.text.y = element_text(size=10))+
-      facet_grid(.~DegreeLevel)
+      theme(axis.text.y = element_text(size=10)) +
+      facet_grid(.~DegreeLevel) +
+      labs(title="Federal Debt Loads Upon Entering Repayment by Institution Type, 1997-2013")    
 
 
+#write file out to .emf file for microsoft word
+library(devEMF)
 
+emf(file = "sidebyside_bw.emf",
+    bg = "transparent",
+    family = "Helvetica", 
+    width = 10,
+    height = 6)
+sidebyside_bw
+dev.off()
 
-####################################
-## separate graphs for 2 and 4 yr ##
-####################################
-
-twoyeargraph <- graphcategories %>%
-                  filter(DegreeLevel == "Certificate/Associates") %>%
-                  ggplot(aes(x=data.year,
-                             y=meandebt,
-                             linetype=factor(mn.category),
-                             group = factor(mn.category)))
-
-twoyeargraph + 
-      geom_line(size = 1.5) +
-      scale_x_continuous("Year", limits = c(1997, 2013), breaks = c(1997, 2001, 2005, 2009, 2013)) +
-      scale_y_continuous("Average Median Debt Amount Upon Entering Repayment", limits = c(0,15000), labels=dollar) +
-      guides(linetype = guide_legend(title = "")) +
-      theme_minimal() +
-      theme(legend.position = "bottom")
-
-
-fouryeargraph <- graphcategories %>%
-      filter(DegreeLevel == "Bachelor's") %>%
+#### Color line version ####
+graph_color <- graphcategories %>%
+      filter(DegreeLevel == "Certificate/Associate's" | DegreeLevel == "Bachelor's") %>%
+      mutate(DegreeLevel = factor(DegreeLevel, 
+                                  levels = c("Bachelor's",
+                                             "Certificate/Associate's"                   ),
+                                  labels=c("Predominantly 4-Year Degree Granting", 
+                                           "Predominantly 2-Year Degree Granting"))) %>%
       ggplot(aes(x=data.year,
                  y=meandebt,
                  color=factor(mn.category),
                  group = factor(mn.category)))
 
-fouryeargraph + 
-      geom_line(size = 1.5) +
-      scale_x_continuous("Year", limits = c(1997, 2013), breaks = c(1997, 2001, 2005, 2009, 2013)) +
-      scale_y_continuous("Average Median Debt Amount Upon Entering Repayment", limits = c(0,20000), labels=dollar) +
-      guides(col = guide_legend(title = "Institution Type", title.theme = element_text(angle = 0, size =10)))
+
+sidebyside_color <- graph_color+ 
+      geom_line() + 
+      scale_x_continuous("", limits = c(1997, 2013), breaks = c(1997, 2001, 2005, 2009, 2013)) +
+      scale_y_continuous("Average Median Debt (Nominal $)", limits = c(0,20000), labels=dollar) +
+      guides(color = guide_legend(title = "")) +
+      theme_minimal() +
+      theme(legend.position = "bottom") +
+      theme(axis.text.y = element_text(size=10)) +
+      facet_grid(.~DegreeLevel) +
+      labs(title="Federal Debt Loads Upon Entering Repayment by Institution Type, 1997-2013")    
+
+#write file out to .png file for microsoft word
+sidebyside_color
+ggsave("sidebyside_color.png", width=10, height=6)
+
+
+# #write file out to .emf file for microsoft word
+# library(devEMF)
+# emf(file = "sidebyside_color.emf",
+#     bg = "transparent",
+#     family = "Helvetica", 
+#     width = 10,
+#     height = 6)
+# sidebyside_color
+# dev.off()
+
+####################################
+## separate graphs for 2 and 4 yr ##
+####################################
+
+
+#### Black and white 2yr graph ####
+graph_twoyr <- graphcategories %>%
+      filter(DegreeLevel == "Certificate/Associate's") %>%
+      ggplot(aes(x=data.year,
+                 y=meandebt,
+                 shape=factor(mn.category),
+                 group=factor(mn.category)))
+
+graph_twoyr <-graph_twoyr + 
+      geom_line() + 
+      geom_point(size=2) +
+      scale_x_continuous("", limits = c(1997, 2013), breaks = c(1997, 2001, 2005, 2009, 2013)) +
+      scale_y_continuous("Average Median Debt (Nominal $)", limits = c(0,20000), labels=dollar) +
+      guides(shape = guide_legend(title = "")) +
+      theme_bw() +
+      theme(legend.position = "bottom") +
+      theme(axis.text.y = element_text(size=10)) +
+      labs(title="Federal Debt Loads Upon Entering Repayment, Two-year Schools, 1997-2013")    
+
+graph_twoyr
+#write file out to .emf file for microsoft word
+library(devEMF)
+
+emf(file = "twoyearschools.emf",
+    bg = "transparent",
+    family = "Helvetica", 
+    width = 10,
+    height = 6)
+graph_twoyr
+dev.off()
+
+
+#### Black and white 4yr graph ####
+graph_fouryr <- graphcategories %>%
+      filter(DegreeLevel == "Bachelor's") %>%
+      ggplot(aes(x=data.year,
+                 y=meandebt,
+                 shape=factor(mn.category),
+                 group=factor(mn.category)))
+
+graph_fouryr <-graph_fouryr + 
+      geom_line() + 
+      geom_point(size=2) +
+      scale_x_continuous("", limits = c(1997, 2013), breaks = c(1997, 2001, 2005, 2009, 2013)) +
+      scale_y_continuous("Average Median Debt (Nominal $)", limits = c(0,20000), labels=dollar) +
+      guides(shape = guide_legend(title = "")) +
+      theme_bw() +
+      theme(legend.position = "bottom") +
+      theme(axis.text.y = element_text(size=10)) +
+      labs(title="Federal Debt Loads Upon Entering Repayment, Four-year Schools, 1997-2013")    
+
+graph_fouryr
+
+#write file out to .emf file for microsoft word
+library(devEMF)
+
+emf(file = "fouryearschools.emf",
+    bg = "transparent",
+    family = "Helvetica", 
+    width = 10,
+    height = 6)
+graph_fouryr
+dev.off()
+

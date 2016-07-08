@@ -37,9 +37,9 @@ debtdata <- mutate(debtdata, instnm = tolower(instnm)) %>%
 
 #### categorize schools by number of years ## 
 debtdata$DegreeLevel <- ""
-debtdata[(debtdata$preddeg == 1 | debtdata$preddeg == 2),]$DegreeLevel <- "Certificate/Associates"
+debtdata[(debtdata$preddeg == 1 | debtdata$preddeg == 2),]$DegreeLevel <- "Certificate/Associate's"
 debtdata[debtdata$preddeg == 3,]$DegreeLevel <- "Bachelor's"
-debtdata[debtdata$preddeg == 4,]$DegreeLevel <- "Bachelor's"
+debtdata[debtdata$preddeg == 4,]$DegreeLevel <- "Master's"
 
 
 #### categorize schools narrowly ####
