@@ -67,7 +67,8 @@ debtdata$school.category <- ""
       
       #not classified
       debtdata[debtdata$control == 0 | debtdata$preddeg == 0, ]$school.category <- "Not Classified"
-
+      
+      
 #### categorize schools into degree categories ####
 debtdata$degree.category <- ""
       
